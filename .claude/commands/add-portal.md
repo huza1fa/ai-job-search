@@ -12,7 +12,7 @@ Follow these steps **in order**.
 
 ## Step 0: Parse Arguments
 
-- If `$ARGUMENTS` contains `--list`: use Glob with `.agents/skills/*/SKILL.md`, print a table of installed portal skills (name, market from the description, data source from `url-reference.md`), and stop.
+- If `$ARGUMENTS` contains `--list`: use Glob with `.agents/skills/*/SKILL.md`, include only directories containing `cli/src/cli.ts` (not workflow adapters), print a table of installed portal skills (name, market from the description, data source from `url-reference.md`), and stop.
 - If `$ARGUMENTS` contains a URL: treat it as the portal URL and carry it into Step 1.
 - Otherwise: start the interview at Step 1.
 

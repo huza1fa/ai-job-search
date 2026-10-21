@@ -2,6 +2,11 @@
 
 Step-by-step instructions for getting the AI Job Search framework running.
 
+> **Codex CLI/IDE:** use [CODEX.md](CODEX.md) for this fork's setup and runtime
+> mappings, including `$setup` skill invocation and `/hooks` policy review. Run
+> `python3 tools/doctor.py --agent codex --runtime` before application work. The
+> Claude-specific CLI and slash-command instructions below are not Codex commands.
+
 ## 1. Prerequisites
 
 ### Claude Code

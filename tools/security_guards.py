@@ -38,7 +38,12 @@ Checks:
    (a `Bash(pattern)` entry resolves to plain Bash), so a patterned entry is
    rejected as misleading; settings.json's allow list is what scopes Bash.
 
-Stdlib only. Exit 0 on success, 1 with a failure list otherwise.
+6. Codex adapters — canonical coverage, reviewed sandbox/network/config keys,
+   agent pointers/features, and no unreviewed hooks/rules files. Static checks,
+   not runtime enforcement of agent prose. Python 3.10 needs optional tomli;
+   Python 3.11+ uses the standard library.
+
+Exit 0 on success, 1 with a failure list otherwise.
 """
 
 import json
@@ -606,6 +611,12 @@ def main() -> int:
     check_tracked_node_modules()
     check_skill_tool_grants()
     check_agent_tool_grants()
+    if (ROOT / ".codex").is_dir():
+        try:
+            from .codex_adapters import check as check_codex
+        except ImportError:
+            from codex_adapters import check as check_codex
+        errors.extend(check_codex(ROOT))
     if errors:
         print(f"security_guards: {len(errors)} failure(s)")
         for err in errors:

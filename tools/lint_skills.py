@@ -10,6 +10,7 @@ Checks:
   that exist (skill paths resolve relative to the repo root and to .agents/)
 - Every .claude/commands/*.md starts with a `# /<name>` title
 - .claude/settings.json is valid JSON with a permissions.allow list
+- Codex adapters cover every canonical workflow and retain reviewed defaults
 
 Exit code 0 on success, 1 with a failure list otherwise.
 """
@@ -108,6 +109,12 @@ def main() -> int:
     for command in commands:
         check_command(command)
     check_settings()
+    if (ROOT / ".codex").is_dir():
+        try:
+            from .codex_adapters import check as check_codex
+        except ImportError:
+            from codex_adapters import check as check_codex
+        errors.extend(check_codex(ROOT))
 
     if errors:
         print(f"lint_skills: {len(errors)} failure(s)")

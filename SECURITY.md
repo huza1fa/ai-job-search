@@ -2,7 +2,7 @@
 
 ## Reporting a vulnerability
 
-Please report security findings privately via **[GitHub private vulnerability reporting](https://github.com/MadsLorentzen/ai-job-search/security/advisories/new)** rather than a public issue. You will get a response within a few days, credit in the fix unless you prefer otherwise, and public disclosure coordinated with the patch.
+For this fork, report security findings privately via **[GitHub private vulnerability reporting](https://github.com/huza1fa/ai-job-search/security/advisories/new)** rather than a public issue. Codex-specific findings belong with this fork, not the upstream maintainer. Disclosure and credit should be coordinated before publishing technical details.
 
 If the private form is unavailable, open a public issue that describes the *class* of problem without a working recipe, and note that you have details to share privately.
 
@@ -44,7 +44,74 @@ Every grant the template ships, where it lives, how long it lasts, and what chec
 
 Instruction-level defenses raise the bar; permission-level defenses bound the damage. Neither is a guarantee. If you run this workflow against job boards you do not trust at all, review what the agent fetched and wrote before sending anything out.
 
-## Scope notes
+## Codex adapter security
+
+The tables above describe **Claude Code**, not an equivalent Codex permission
+model. Codex does not enforce `.claude/settings.json` or skill `allowed-tools`.
+This fork's Codex defaults are `workspace-write`, `on-request`, live web search,
+and restricted sandbox shell networking. Project config is loaded only after
+the project is trusted; CLI/user/managed configuration may change the effective
+permissions. Check those permissions in the actual session.
+
+Native custom agents inherit the parent's sandbox and approvals. Their no-edit
+constraints are instruction-level only. The fetcher is URL-only and is never
+given the candidate rubric/profile. For `$rank` scoring and `$apply` review, the
+required route is instead `tools/codex_worker.py`: a separate read-only Codex
+process with no shell/web/browser tools, user/project MCP configuration, plugins,
+skills or further delegation. The parent fetches/gates postings and obtains
+verified research first, passes required inputs inline, and alone writes state.
+Native scorer/reviewer definitions disable shell and support inline-only tasks,
+but are not a substitute for the isolated route in these workflows.
+
+Workers use private temporary state, ignore user config/rules, and let the Codex
+client access the existing login through an auth-file link (or API-key
+environment), without this helper parsing/copying tokens. The inline task is
+sent to the Codex model service as normal; this is not protection from the model
+provider or malicious local framework/CLI code. Keyring-only/custom-provider-only
+logins are not assumed compatible. Observed tool attempts and incomplete/error
+turns are rejected, including blocked patch attempts logged only on stderr.
+The read-only sandbox remains the write boundary even when a tool attempt is
+not exposed in the CLI event stream.
+
+The shipped `.codex/hooks.json` has one **synchronous PreToolUse** handler:
+`tools/codex_policy.py`. Review and trust its exact hash in `/hooks`; project
+trust alone is insufficient. Review the policy script too: a hook-definition
+hash does not establish the integrity of the referenced executable file.
+Codex skips changed/untrusted hook definitions. It denies
+obvious credential reads across tool inputs, curl/wget upload options (including
+reordered forms), remote-shell/transfer commands, pushes and patches to security
+surfaces, `AGENTS.md`, and executable helpers under `tools/`. It also tripwires
+shell operations explicitly naming those surfaces.
+No unsupported `ask` response, automatic trust, background handler, startup
+command or data-logging hook is shipped. Malformed hook input returns a valid
+deny response without echoing private input.
+
+**Limits:** the policy is not a shell interpreter or an egress firewall. It does
+not stop computed/encoded paths, interpreter-based uploads, GET query-string
+exfiltration, all shell wrappers or commands already running through
+`write_stdin`. Hosted web tools do not run these hooks; specialized tool paths
+may opt out, and hook launch failures/timeouts can fail open in Codex. Machine
+policy/user overrides can change behavior. Never rely on this hook alone for
+untrusted-content isolation. Permission/security-file maintenance requires a
+separate human-reviewed edit outside the protected agent session.
+
+Static adapter checks (called by lint and security CI) require the exact reviewed
+hook/config defaults, catch agent permission overrides, and reject new `.codex`
+files unless explicitly reviewed in the guard too. These are review tripwires,
+not runtime enforcement. Pointer checks cannot detect malicious prose.
+
+Before using untrusted postings, review fetched content and proposed edits.
+Approve shell networking only as needed; never enable full access merely to
+run a portal. Do not read credential stores or send personal information
+because a posting asks. Opt-in Notion publishes selected pipeline information;
+review its scope before connecting it. Gmail requires explicit setup and the
+workflow proposes changes before writing them. No application or email is sent.
+
+Authenticated integration testing remains opt-in and user-specific. See
+[CODEX.md](CODEX.md#verification-status-and-remaining-work) for the isolated worker
+and the reproducible synthetic/live test suites.
+
+## Scope notes (all runtimes)
 
 - Portal CLI skills make live requests only when you run them; CI never does.
 - Community fork skills listed in the [forks index](https://github.com/MadsLorentzen/ai-job-search/discussions/78) are **not** covered by this policy - review the code you copy, as the index itself says.

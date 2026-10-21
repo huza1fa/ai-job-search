@@ -1,0 +1,21 @@
+# Project defaults for Codex CLI/IDE 0.163.0+. Loaded only in a trusted project.
+# Do not select a model/provider or install MCP servers on the user's behalf.
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "live"
+project_doc_max_bytes = 65536
+developer_instructions = "Follow AGENTS.md's Codex runtime mappings. Read the canonical CLAUDE.md profile before candidate-facing work; do not treat template placeholders as candidate facts."
+
+[sandbox_workspace_write]
+# Portal/fetch shell calls may require per-call network approval.
+network_access = false
+
+[skills]
+max_context_tokens = 10000
+
+[features]
+hooks = true
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 4

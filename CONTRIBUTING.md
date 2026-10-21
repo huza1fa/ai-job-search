@@ -1,5 +1,25 @@
 # Contributing
 
+## Contributing to this fork
+
+This is [huza1fa's Codex-support fork](https://github.com/huza1fa/ai-job-search).
+Codex adapters, isolation, diagnostics, tests and documentation are maintained
+here; submit those issues and PRs to **this fork**, not to upstream.
+
+Keep `.claude/` canonical, keep runtime adapters thin, add a regression test for
+behavior changes, and never commit candidate profiles or application records.
+Run the checks in [README.md](README.md#reproduce-the-checks); live Codex tests
+are explicitly opt-in and must use synthetic data. Security-surface changes
+need explicit review; do not weaken a policy just to make a test pass.
+
+## Upstream contribution policy (preserved reference)
+
+The guidance below describes the original
+[MadsLorentzen/ai-job-search](https://github.com/MadsLorentzen/ai-job-search)
+project. Its Claude-only maintenance scope is why this fork exists, **not** a
+ban on Codex contributions here. Check the destination repository before filing
+anything: changes intended for upstream must follow upstream's policy.
+
 Thanks for considering a contribution! This repo has a deliberate, narrow philosophy, and most declined PRs are well-executed work that simply didn't know about it. Read this first; it will save you effort and tell you where your work will land best.
 
 ## The one rule everything follows from

@@ -1,0 +1,18 @@
+{
+  "description": "Review and trust this PreToolUse tripwire via /hooks. It is not a sandbox or a replacement for read-only scoring/review.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$(git rev-parse --show-toplevel)/tools/codex_policy.py\"",
+            "timeout": 10,
+            "statusMessage": "Checking job-search security tripwires"
+          }
+        ]
+      }
+    ]
+  }
+}
